@@ -62,22 +62,35 @@ function createFilterControls(result, domain) {
   const controls = document.createElement('div');
   controls.className = 'filter-controls';
   
-  // Create checkbox
-  const checkbox = document.createElement('input');
-  checkbox.type = 'checkbox';
-  checkbox.className = 'filter-checkbox';
-  checkbox.checked = getFilteredDomainsFromQuery().has(domain);
-  checkbox.title = 'Filter out this domain';
+  // Create Pacman button
+  const button = document.createElement('button');
+  button.className = 'filter-button';
+  button.title = 'Filter out this domain';
+  const isFiltered = getFilteredDomainsFromQuery().has(domain);
+  if (isFiltered) {
+    button.classList.add('active');
+  }
   
-  checkbox.addEventListener('change', () => {
-    if (checkbox.checked) {
+  button.innerHTML = `
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+      <path d="M5.636 5.636a9 9 0 0 1 13.397 .747l-5.619 5.617l5.619 5.617a9 9 0 1 1 -13.397 -11.981z" />
+      <circle cx="11.5" cy="7.5" r="1" fill="currentColor" />
+    </svg>
+  `;
+  
+  button.addEventListener('click', () => {
+    const isCurrentlyFiltered = button.classList.contains('active');
+    if (!isCurrentlyFiltered) {
+      button.classList.add('active');
       modifySearchWithFilters(domain);
     } else {
+      button.classList.remove('active');
       modifySearchWithFilters(null, domain);
     }
   });
   
-  controls.appendChild(checkbox);
+  controls.appendChild(button);
   return controls;
 }
 

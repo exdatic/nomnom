@@ -6,17 +6,43 @@
 /* Filter controls container */
 .filter-controls {
   position: absolute;
-  right: -30px;
+  right: -36px;
   top: 50%;
   transform: translateY(-50%);
 }
 
-/* Checkbox styling */
-.filter-checkbox {
+/* Pacman button styling */
+.filter-button {
   cursor: pointer;
-  width: 16px;
-  height: 16px;
-  margin: 0;
+  background: none;
+  border: none;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #9aa0a6;
+  transition: all 0.2s ease;
+}
+
+.filter-button:hover {
+  background: #f1f3f4;
+  color: #1a73e8;
+}
+
+.filter-button.active {
+  color: #1a73e8;
+}
+
+.filter-button svg {
+  width: 20px;
+  height: 20px;
+  transform: rotate(45deg);
+  transition: transform 0.3s ease;
+}
+
+.filter-button.active svg {
+  transform: rotate(225deg);
 }
 
 /* Filtered domains pills container */
