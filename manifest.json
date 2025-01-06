@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Nom Nom",
   "version": "1.0",
-  "description": "Filter out unwanted search results 🎮",
+  "description": "Remove unwanted domains from Google search results 🎮",
   "permissions": [
     "storage"
   ],
