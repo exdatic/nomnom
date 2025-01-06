@@ -1,6 +1,19 @@
 // Store filtered domains with timestamps
 let filteredDomainsWithTime = new Map(); // domain -> timestamp
 
+// Function to clean domain (strip www.)
+function cleanDomain(domain) {
+  return domain.replace(/^www\./, '');
+}
+
+// Function to check if a domain matches any filtered domain
+function isDomainFiltered(domain, filteredDomains) {
+  const cleanedDomain = cleanDomain(domain);
+  return Array.from(filteredDomains).some(filtered => 
+    cleanDomain(filtered) === cleanedDomain
+  );
+}
+
 // Function to get filtered domains from search query
 function getFilteredDomainsFromQuery() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -10,7 +23,7 @@ function getFilteredDomainsFromQuery() {
   // Extract all -site: domains from query
   const matches = query.match(/-site:(\S+)\s*/g) || [];
   matches.forEach(match => {
-    const domain = match.replace('-site:', '').trim();
+    const domain = cleanDomain(match.replace('-site:', '').trim());
     domains.add(domain);
     // Add timestamp if not exists
     if (!filteredDomainsWithTime.has(domain)) {
@@ -38,8 +51,8 @@ function modifySearchWithFilters(addDomain = null, removeDomain = null) {
   
   // Get current filtered domains and update as needed
   const domains = getFilteredDomainsFromQuery();
-  if (addDomain) domains.add(addDomain);
-  if (removeDomain) domains.delete(removeDomain);
+  if (addDomain) domains.add(cleanDomain(addDomain));
+  if (removeDomain) domains.delete(cleanDomain(removeDomain));
   
   // Add -site: filter for each domain
   const filters = Array.from(domains)
@@ -66,7 +79,7 @@ function createFilterControls(result, domain) {
   const button = document.createElement('button');
   button.className = 'filter-button';
   button.title = 'Filter out this domain';
-  const isFiltered = getFilteredDomainsFromQuery().has(domain);
+  const isFiltered = isDomainFiltered(domain, getFilteredDomainsFromQuery());
   if (isFiltered) {
     button.classList.add('active');
   }
