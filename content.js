@@ -1,3 +1,6 @@
+// Store filtered domains with timestamps
+let filteredDomainsWithTime = new Map(); // domain -> timestamp
+
 // Function to get filtered domains from search query
 function getFilteredDomainsFromQuery() {
   const urlParams = new URLSearchParams(window.location.search);
@@ -9,7 +12,18 @@ function getFilteredDomainsFromQuery() {
   matches.forEach(match => {
     const domain = match.replace('-site:', '').trim();
     domains.add(domain);
+    // Add timestamp if not exists
+    if (!filteredDomainsWithTime.has(domain)) {
+      filteredDomainsWithTime.set(domain, Date.now());
+    }
   });
+  
+  // Clean up old domains
+  for (const [domain] of filteredDomainsWithTime) {
+    if (!domains.has(domain)) {
+      filteredDomainsWithTime.delete(domain);
+    }
+  }
   
   return domains;
 }
@@ -102,9 +116,36 @@ function createDomainPill(domain) {
   return pill;
 }
 
+// Create show more pill
+function createShowMorePill(totalCount) {
+  const pill = document.createElement('div');
+  pill.className = 'domain-pill show-more-pill';
+  
+  const remainingCount = totalCount - 3;
+  pill.innerHTML = `
+    <span>Show ${remainingCount} more</span>
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  `;
+  
+  pill.addEventListener('click', () => {
+    const container = document.querySelector('.filtered-domains-pills');
+    if (container) {
+      container.classList.toggle('expanded');
+      const remainingCount = totalCount - 3;
+      const text = container.classList.contains('expanded') ? 'Show less' : `Show ${remainingCount} more`;
+      pill.querySelector('span').textContent = text;
+    }
+  });
+  
+  return pill;
+}
+
 // Create or update the filtered domains pills
 function updateFilteredDomainsPills() {
   let container = document.querySelector('.filtered-domains-pills');
+  
   if (!container) {
     container = document.createElement('div');
     container.className = 'filtered-domains-pills';
@@ -123,13 +164,13 @@ function updateFilteredDomainsPills() {
     }
   }
   
-  // Clear existing pills
+  // Get and sort domains by timestamp (most recent first)
+  const domains = getFilteredDomainsFromQuery();
+  
+  // Clear existing content
   container.innerHTML = '';
   
-  // Get and sort domains
-  const domains = Array.from(getFilteredDomainsFromQuery()).sort();
-  
-  if (domains.length === 0) {
+  if (domains.size === 0) {
     const emptyMessage = document.createElement('div');
     emptyMessage.className = 'filtered-domains-empty';
     emptyMessage.textContent = 'No filtered domains';
@@ -137,11 +178,32 @@ function updateFilteredDomainsPills() {
     return;
   }
   
-  // Add pills for each domain
-  domains.forEach(domain => {
+  // Sort domains by timestamp
+  const sortedDomains = Array.from(domains)
+    .sort((a, b) => filteredDomainsWithTime.get(b) - filteredDomainsWithTime.get(a));
+  
+  // Add first 3 most recent pills
+  const visibleDomains = sortedDomains.slice(0, 3);
+  visibleDomains.forEach(domain => {
     const pill = createDomainPill(domain);
     container.appendChild(pill);
   });
+  
+  // Add show more pill if needed
+  if (domains.size > 3) {
+    const showMorePill = createShowMorePill(domains.size);
+    container.appendChild(showMorePill);
+    
+    // Add remaining pills (hidden initially)
+    const remainingDomains = sortedDomains.slice(3);
+    const hiddenContainer = document.createElement('div');
+    hiddenContainer.className = 'hidden-pills';
+    remainingDomains.forEach(domain => {
+      const pill = createDomainPill(domain);
+      hiddenContainer.appendChild(pill);
+    });
+    container.appendChild(hiddenContainer);
+  }
 }
 
 // Process search results

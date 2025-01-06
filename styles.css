@@ -24,7 +24,7 @@
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  padding: 12px 20px;
+  padding: 8px 20px;
   background: white;
   min-height: 24px;
   align-items: center;
@@ -34,6 +34,42 @@
   border-bottom: 1px solid #dfe1e5;
   margin-bottom: 12px;
   box-shadow: 0 1px 6px rgba(32,33,36,0.08);
+  transition: max-height 0.3s ease-in-out;
+}
+
+/* Show more pill specific styling */
+.show-more-pill {
+  cursor: pointer;
+  background: #e8f0fe;
+  border-color: #1a73e8;
+  color: #1a73e8;
+}
+
+.show-more-pill:hover {
+  background: #d2e3fc;
+}
+
+.show-more-pill svg {
+  transition: transform 0.3s;
+}
+
+/* Hidden pills container */
+.hidden-pills {
+  display: none;
+  width: 100%;
+  margin-top: 8px;
+}
+
+/* Show hidden pills when expanded */
+.filtered-domains-pills.expanded .hidden-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Rotate arrow when expanded */
+.filtered-domains-pills.expanded .show-more-pill svg {
+  transform: rotate(180deg);
 }
 
 /* Container when empty */
